@@ -4,51 +4,102 @@ const Home = require('../models/Home');
 const Device = require('../models/Device');
 const Room = require('../models/Room');
 
-// Register a user and link homeId
+// Register a user ,using name,email and password
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, homeId } = req.body;
-        if (!name || !email || !password || !homeId) {
-            return res.status(400).json({ message: 'Name, email, password, and homeId are required' });
-        }
-
-        const home = await Home.findById(homeId);
-        if (!home) {
-            return res.status(404).json({ message: 'Home does not exist' });
+        const { name, email, password } = req.body;
+        if (!name || !email || !password ) {
+            return res.status(400).json({ message: 'Name, email, password are required' });
         }
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ message: 'Email already in use' });
         }
-
+/*
         const homeUsers = await User.find({ home_id: homeId });
         const role = homeUsers.length === 0 ? 'Admin' : 'User'; // First user is Admin
 
+        */
         const user = new User({
             name,
             email,
-            password, // Add hashing in production
-            role,
-            home_id: homeId,
+            password // Add hashing in production
         });
+
         await user.save();
+
+        /*
 
         if (!home.owner_id && role === 'Admin') {
             home.owner_id = user._id;
             await home.save();
         }
+            */
 
-        res.status(201).json({ message: 'User registered', userId: user._id, role });
+        res.status(200).json({ message: 'User registered' /*, userId: user._id, role*/ });
     } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).json({ message: 'Email already in use' });
+        if (error) {
+            return res.status(500).json({ message: 'Error registering user', error: error.message });};
         }
-        res.status(500).json({ message: 'Error registering user', error: error.message });
+        
+    };
+
+    
+// Controller for login
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Check if email and password are provided
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required.' });
+        }
+        // Find the user in the database
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        if (password != user.password) {
+            return res.status(401).json({ message: 'Invalid credentials.' });
+        }
+        // Respond with a success message and token
+        return res.status(200).json({ message: 'User logged in'});
+    } catch (error) {
+        console.error('Error during login:', error);
+        return res.status(500).json({ message: 'An error occurred during login.', error: error.message });
     }
 };
 
+// Controller for Checking User 
+const checkUser = async (req, res) => {
+    try {
+        const { userId } = req.body;
 
+        // Validate the email input
+         // Validate the userId format
+         if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid User ID format.' });
+        }
+       
+        // Find the user in the database by its id
+        const user = await User.findOne({ userId });
+        if (user) {
+            // If user exists, return success response
+            return res.status(200).json({ message: 'User exists in the system.'});
+        } else {
+            // If user does not exist, return not found response
+            return res.status(404).json({ message: 'User not available' });
+        }
+    } catch (error) {
+        console.error('Error checking user existence:', error);
+        return res.status(500).json({ message: 'An error occurred while checking user existence.', error: error.message });
+    }
+};
+        
+
+
+/* //Not in required Controllers
 // Assign Admin role (Admin only)
 const assignAdminRole = async (req, res) => {
     try {
@@ -71,5 +122,6 @@ const assignAdminRole = async (req, res) => {
         res.status(500).json({ message: 'Error assigning Admin role', error: error.message });
     }
 };
+*/
 
-module.exports = { registerUser, assignAdminRole };
+module.exports = { registerUser,loginUser, checkUser /*assignAdminRole*/ };
