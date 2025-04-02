@@ -6,7 +6,8 @@ To test controllers you need to import /db folder in your project. Otherwise you
 Project Structure
 
 
-![image](https://github.com/user-attachments/assets/73dfa8d1-6b05-43a6-bcff-5510971818ec)
+![image](https://github.com/user-attachments/assets/e2c0a6e7-cfbc-46e5-a5e0-306a152a5a92)
+
 
 
 Setup
@@ -30,59 +31,13 @@ Setup
 API Endpoints
 
 Test these endpoints using Postman or a similar tool.
+*******************************************
+![image](https://github.com/user-attachments/assets/e8d2b8e8-7249-4ff3-9cb0-c7f15944a192)
+![image](https://github.com/user-attachments/assets/ea28b26d-63c2-4758-a311-abfd69c01292)
+![image](https://github.com/user-attachments/assets/17d33b58-9fe3-4164-8d43-90f3075edf30)
+![image](https://github.com/user-attachments/assets/f6574074-db87-4346-b129-d413d1a54f80)
+![image](https://github.com/user-attachments/assets/d1a8dd17-f764-462e-872f-623a3605b484)
 
-Creates a new home in the database and returns a `homeId`.
-- Request:
-  POST http://localhost:3000/api/generate-home
-  - Body: (empty)
-- Expected Response:
-  {"homeId": "some-id"}
-
-Saves devices under a specified `homeId`.
-- Request:
-  POST http://localhost:3000/api/save-devices
-  - Body:
-    {
-        "homeId": "some-id",
-        "devices": [
-            {"device_name": "Living Room Light", "device_type": "light", "status": "Off"}
-        ]
-    }
-
-Register User
-Registers a user and links them to a `homeId`. The first user for a home becomes the `Admin`.
-- Request:
-  POST http://localhost:3000/api/register
-  - Body:
-    {
-        "name": "Alice",
-        "email": "alice@example.com",
-        "password": "secret123",
-        "homeId": "some-id"
-    }
-
-Control Device (After Registration)
-Updates the status of a device (e.g., "On", "Off", "Standby").
-- Request:
-  POST http://localhost:3000/api/control-device
-  - Body:
-    {
-        "userId": "user-id-from-registration",
-        "deviceId": "device-id-from-get-devices",
-        "status": "On"
-    }
-
-Example: Test Device Control
-Use this example to test controlling a device with Alice’s `userId` and a known `deviceId`.
-- Request:
-  POST http://localhost:3000/api/control-device
-  - Body:
-    {
-        "userId": "67ec0c4a4c8f64374250de04",
-        "deviceId": "67ec08e34c8f64374250ddff",
-        "status": "On"
-    }
-  - Note: Replace `deviceId` with an actual ID from your `devices` collection under `homeId: "67ec03dc85998f49ad05f7f0"`.
 
 Testing Tips
 - MongoDB Compass: Use to view changes in the `smarthome` database (`homes`, `users`, `devices` collections).
