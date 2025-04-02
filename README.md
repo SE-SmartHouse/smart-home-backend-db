@@ -1,6 +1,7 @@
-# SmartHome Backend
+# SmartHome Backend Controllers
 
-This is the backend for the SmartHomeApp, built with Node.js, Express, and MongoDB. It handles home creation, device management, user registration, and device control for a smart home system.
+This is how the backend for the SmartHomeApp, built with Node.js, Express, and MongoDB will look like. It handles home creation, device management, user registration, and device control for a smart home system.
+To test controllers you need to import /db folder in your project. Otherwise you can use the routers i created below for testing.
 
 Project Structure
 
@@ -20,7 +21,7 @@ Setup
 
 3. Start MongoDB:
    - Run MongoDB locally (Windows example):
-     "C:\Program Files\MongoDB\Server\7.0\bin\mongod.exe"
+     "C:\Program Files\MongoDB\Server\8.0\bin\mongod.exe"
 
 4. Start Server:
    npm start
@@ -30,7 +31,6 @@ API Endpoints
 
 Test these endpoints using Postman or a similar tool.
 
-Generate Home ID (For Hardware Server)
 Creates a new home in the database and returns a `homeId`.
 - Request:
   POST http://localhost:3000/api/generate-home
@@ -38,7 +38,6 @@ Creates a new home in the database and returns a `homeId`.
 - Expected Response:
   {"homeId": "some-id"}
 
-Save Devices (For Hardware Server)
 Saves devices under a specified `homeId`.
 - Request:
   POST http://localhost:3000/api/save-devices
@@ -89,9 +88,7 @@ Testing Tips
 - MongoDB Compass: Use to view changes in the `smarthome` database (`homes`, `users`, `devices` collections).
 - MongoDB Shell: Query with:
   use smarthome
-  db.devices.find({ _id: ObjectId("67ec08e34c8f64374250ddff") })
-- Postman: Import requests from this README for quick testing.
-
+  db.devices.find({ _id: ObjectId("any id") })
 Notes
 - Passwords are stored in plain text—add hashing (e.g., bcrypt) for production.
 - Authentication (e.g., JWT) is not yet implemented.
