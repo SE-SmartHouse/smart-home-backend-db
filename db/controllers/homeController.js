@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Home = require('../models/Home');
 const Device = require('../models/Device');
+const Room = require('../models/Room'); // I added this
 
 // Generate a new homeId
 const generateHomeId = async (req, res) => {
@@ -50,4 +51,60 @@ const saveHomeDevices = async (req, res) => {
     }
 };
 
-module.exports = { generateHomeId, saveHomeDevices };
+
+
+
+//The following new functionalities are added based on the group's comment
+
+
+const createNewHome = async (req, res) => {
+    try {
+        const { home_name, address, floor_number } = req.body;
+        
+        // Create home with custom name or default generated name
+        const home = new Home({
+            home_name: home_name || `Home-${new mongoose.Types.ObjectId().toString().slice(-6)}`,
+            address: address || null,
+        });
+
+        // Create living room with custom floor or default (1)
+        const livingRoom = new Room({
+            room_name: 'Living Room',
+            home_id: home._id,
+            floor_number: floor_number || 1
+        });
+
+        await Promise.all([home.save(), livingRoom.save()]);
+        
+        res.status(201).json({ 
+            homeId: home._id,
+            home_name: home.home_name,
+            address: home.address,
+            rooms: [livingRoom]
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            message: 'Error creating home', 
+            error: error.message 
+        });
+    }
+};
+
+
+// Get rooms in home
+const getHomeRooms = async (req, res) => {
+    try {
+        const { homeId } = req.params;
+        const rooms = await Room.find({ home_id: homeId });
+        res.status(200).json(rooms);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching rooms', error: error.message });
+    }
+};
+
+module.exports = { 
+    generateHomeId, 
+    saveHomeDevices, 
+    createNewHome,
+    getHomeRooms
+};

@@ -1,6 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { generateHomeId, saveHomeDevices } = require('../db/controllers/homeController');
+const { generateHomeId, saveHomeDevices, createNewHome, getHomeRooms} = require('../db/controllers/homeController');
+
+
+router.post('/homes/createNewHome', createNewHome);
+
+// Get rooms for a home
+router.get('/homes/:homeId/rooms', getHomeRooms);
+
 
 router.post('/generate-home', generateHomeId);
 router.post('/save-devices', saveHomeDevices);
