@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { type: String, enum: ['Admin', 'User'], default: 'User' },
   home_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Home' }
+  
 });
 
 userSchema.index({ email: 1 }, { unique: true });

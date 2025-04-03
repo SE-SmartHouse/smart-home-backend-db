@@ -1,21 +1,44 @@
 const mongoose = require('mongoose');
 const Home = require('../models/Home');
 const Device = require('../models/Device');
+
+const User = require('../models/User');
+
 const Room = require('../models/Room'); // I added this
 
-// Generate a new homeId
-const generateHomeId = async (req, res) => {
+
+// Get User homes
+const getUserHomes = async (req, res) => {
     try {
-        const home = new Home({
-            home_name: `Home-${new mongoose.Types.ObjectId().toString().slice(-6)}`, // Temporary name
-        });
-        await home.save();
-        res.status(201).json({ homeId: home._id });
+        const { userId } = req.params;
+
+        // Verify user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Find homes owned by this user
+        const homes = await Home.find({ owner_id: userId });
+        if (!homes.length) {
+            return res.status(200).json([]); // Empty array if no homes
+        }
+
+        
+        const homeList = homes.map(home => ({
+            _id: home._id.toString(),
+            home_name: home.home_name,
+            address: home.address, // No default, schema value or undefined
+        }));
+
+        res.status(200).json(homeList);
     } catch (error) {
-        res.status(500).json({ message: 'Error generating homeId', error: error.message });
+        console.error('Error in getUserHomes:', error);
+        res.status(500).json({ message: 'Error fetching user homes', error: error.message });
     }
 };
 
+/*
 // Save devices under a homeId
 const saveHomeDevices = async (req, res) => {
     try {
@@ -50,6 +73,22 @@ const saveHomeDevices = async (req, res) => {
         res.status(500).json({ message: 'Error saving devices', error: error.message });
     }
 };
+
+
+// Generate a new homeId
+const generateHomeId = async (req, res) => {
+    try {
+        const home = new Home({
+            home_name: `Home-${new mongoose.Types.ObjectId().toString().slice(-6)}`, // Temporary name
+        });
+        await home.save();
+        res.status(201).json({ homeId: home._id });
+    } catch (error) {
+        res.status(500).json({ message: 'Error generating homeId', error: error.message });
+    }
+};
+
+*/
 
 
 
@@ -106,5 +145,6 @@ module.exports = {
     generateHomeId, 
     saveHomeDevices, 
     createNewHome,
-    getHomeRooms
+    getHomeRooms,
+    getUserHomes
 };
