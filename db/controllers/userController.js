@@ -124,5 +124,80 @@ const assignAdminRole = async (req, res) => {
 };
 */
 
-module.exports = { registerUser,loginUser, checkUser /*assignAdminRole*/ };
+
+//My latest addition: Assign a home to a user
+// Assign an existing home to a user (if homeId is provided) 
+// or Create a new home and assign it to the user (if no homeId is provided)
+const assignHomeToUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { homeId, home_name, address, floor_number } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (user.home_id) {
+            return res.status(400).json({ message: 'User already has a home assigned' });
+        }
+
+        const Home = require('../models/Home');
+        const Room = require('../models/Room');
+
+        let home;
+        let isNewHome = false;
+
+        if (homeId) {
+            // Assign existing home
+            home = await Home.findById(homeId);
+            if (!home) {
+                return res.status(404).json({ message: 'Provided homeId does not exist' });
+            }
+
+            // Assign the user as owner if not already
+            if (!home.owner_id) {
+                home.owner_id = user._id;
+                await home.save();
+            }
+
+        } else {
+            // Create new home
+            home = new Home({
+                home_name: home_name || `${user.name}'s Home`,
+                address: address || '',
+                owner_id: user._id
+            });
+
+            await home.save();
+            isNewHome = true;
+
+            // Create default room
+            const livingRoom = new Room({
+                room_name: 'Living Room',
+                home_id: home._id,
+                floor_number: floor_number || 1
+            });
+            await livingRoom.save();
+        }
+
+        // Assign home to user
+        user.home_id = home._id;
+        await user.save();
+
+        res.status(200).json({
+            message: isNewHome ? 'New home created and assigned to user' : 'Existing home assigned to user',
+            homeId: home._id,
+            userId: user._id,
+            home_name: home.home_name
+        });
+    } catch (error) {
+        console.error('Error assigning home:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+};
+
+
+
+module.exports = { registerUser,loginUser, checkUser, assignHomeToUser /*assignAdminRole*/ };
 
