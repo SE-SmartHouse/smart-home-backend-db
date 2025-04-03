@@ -98,4 +98,139 @@ const changeDeviceRoom = async (req, res) => {
 };
 */
 
-module.exports = { /*changeDeviceRoom, /*getHomeDevices,*/ controlDevice ,deviceInfo };
+
+//The following functionalities are added after the group's comment
+
+// Create new device
+/* const createNewDevice = async (req, res) => {
+    try {
+        const { homeId, roomId } = req.params;
+        const { name, type, status } = req.body;
+
+        const device = new Device({
+            device_name: name,
+            device_type: type,
+            status: status || 'Off',
+            home_id: homeId,
+            room_id: roomId
+        });
+
+        await device.save();
+        res.status(201).json(device);
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating device', error: error.message });
+    }
+}; */
+
+
+const createNewDevice = async (req, res) => {
+    try {
+        let { homeId, roomId } = req.params;
+        const { name, type, status } = req.body;
+
+        // Clean and validate IDs
+        homeId = homeId.replace(/ObjectId\("|"\)/g, '').trim();
+        roomId = roomId.replace(/ObjectId\("|"\)/g, '').trim();
+        
+        if (!/^[0-9a-fA-F]{24}$/.test(homeId) || !/^[0-9a-fA-F]{24}$/.test(roomId)) {
+            return res.status(400).json({ 
+                message: 'Invalid ID format',
+                solution: 'Use 24-character hex string',
+                example: '507f191e810c19729de860ea'
+            });
+        }
+
+        // Convert to ObjectId
+        const homeObjectId = new mongoose.Types.ObjectId(homeId);
+        const roomObjectId = new mongoose.Types.ObjectId(roomId);
+
+        // Verify home and room exist
+        const [homeExists, roomExists] = await Promise.all([
+            mongoose.model('Home').exists({ _id: homeObjectId }),
+            mongoose.model('Room').exists({ _id: roomObjectId, home_id: homeObjectId })
+        ]);
+
+        if (!homeExists || !roomExists) {
+            return res.status(404).json({ 
+                message: 'Home or Room not found',
+                homeExists,
+                roomExists
+            });
+        }
+
+        // Validate device data
+        if (!name?.trim() || !type?.trim()) {
+            return res.status(400).json({
+                message: 'Device validation failed',
+                requiredFields: {
+                    name: 'string (2-50 chars)',
+                    type: 'string (e.g., light, thermostat)'
+                }
+            });
+        }
+
+        const device = new Device({
+            device_name: name.trim(),
+            device_type: type.trim(),
+            status: ['On', 'Off', 'Standby'].includes(status) ? status : 'Off',
+            room_id: roomObjectId,
+            home_id: homeObjectId
+        });
+
+        await device.save();
+        res.status(201).json({
+            success: true,
+            device: {
+                _id: device._id,
+                name: device.device_name,
+                type: device.device_type,
+                status: device.status,
+                room_id: device.room_id,
+                home_id: device.home_id
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: 'Device creation failed',
+            error: error.message,
+            received: {
+                params: req.params,
+                body: req.body
+            }
+        });
+    }
+};
+
+// Move device to another room
+const moveDeviceToRoom = async (req, res) => {
+    try {
+        const { deviceId, roomId } = req.params;
+        const { newRoomId } = req.body;
+
+        const device = await Device.findByIdAndUpdate(
+            deviceId,
+            { room_id: newRoomId },
+            { new: true }
+        );
+
+        if (!device) {
+            return res.status(404).json({ message: 'Device not found' });
+        }
+
+        res.status(200).json({ message: 'Device moved successfully', device });
+    } catch (error) {
+        res.status(500).json({ message: 'Error moving device', error: error.message });
+    }
+};
+
+module.exports = { 
+    changeDeviceRoom, 
+    getHomeDevices, 
+    controlDevice,
+    createNewDevice,
+    moveDeviceToRoom,
+  deviceInfo
+};
+
+

@@ -125,3 +125,4 @@ const assignAdminRole = async (req, res) => {
 */
 
 module.exports = { registerUser,loginUser, checkUser /*assignAdminRole*/ };
+
