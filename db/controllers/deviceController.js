@@ -225,8 +225,8 @@ const moveDeviceToRoom = async (req, res) => {
 };
 
 module.exports = { 
-    changeDeviceRoom, 
-    getHomeDevices, 
+    /*changeDeviceRoom, 
+    getHomeDevices, */
     controlDevice,
     createNewDevice,
     moveDeviceToRoom,

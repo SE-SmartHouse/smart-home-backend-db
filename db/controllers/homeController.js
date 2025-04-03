@@ -142,8 +142,8 @@ const getHomeRooms = async (req, res) => {
 };
 
 module.exports = { 
-    generateHomeId, 
-    saveHomeDevices, 
+    /*generateHomeId, 
+    saveHomeDevices,*/ 
     createNewHome,
     getHomeRooms,
     getUserHomes
