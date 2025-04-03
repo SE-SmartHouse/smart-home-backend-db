@@ -1,6 +1,19 @@
 # SmartHome Backend Controllers
 
-This is how the backend for the SmartHomeApp, built with Node.js, Express, and MongoDB will look like. It handles home creation, device management, user registration, and device control for a smart home system.
+-Get device info
+-Register User
+-Login User
+-Check User
+-Change device Status
+-Get user home
+-Add new room
+-Create new home
+-Create new device
+-Get rooms in home
+-Get devices in room
+-Move device to another room
+
+This is how the backend for the SmartHomeApp, built with Node.js, Express, and MongoDB will look like.
 To test controllers you need to import /db folder in your project. Otherwise you can use the routers i created below for testing.
 
 Project Structure
@@ -16,15 +29,16 @@ Setup
    npm install
 
 2. Configure Environment:
+   Use your local DB we have used "smarthome"
    - Create a `.env` file:
      MONGO_URI=mongodb://localhost:27017/smarthome
      PORT=3000
 
-3. Start MongoDB:
+4. Start MongoDB:
    - Run MongoDB locally (Windows example):
      "C:\Program Files\MongoDB\Server\8.0\bin\mongod.exe"
 
-4. Start Server:
+5. Start Server:
    npm start
    - Expected output: `MongoDB connected` and `Server running on port 3000`.
 
