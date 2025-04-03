@@ -1,17 +1,6 @@
 # SmartHome Backend Controllers
+![image](https://github.com/user-attachments/assets/f678931b-50b2-4fd9-87eb-932dced41665)
 
--Get device info
--Register User
--Login User
--Check User
--Change device Status
--Get user home
--Add new room
--Create new home
--Create new device
--Get rooms in home
--Get devices in room
--Move device to another room
 
 This is how the backend for the SmartHomeApp, built with Node.js, Express, and MongoDB will look like.
 To test controllers you need to import /db folder in your project. Otherwise you can use the routers i created below for testing.
