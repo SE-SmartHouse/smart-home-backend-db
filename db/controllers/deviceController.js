@@ -101,28 +101,6 @@ const changeDeviceRoom = async (req, res) => {
 
 //The following functionalities are added after the group's comment
 
-// Create new device
-/* const createNewDevice = async (req, res) => {
-    try {
-        const { homeId, roomId } = req.params;
-        const { name, type, status } = req.body;
-
-        const device = new Device({
-            device_name: name,
-            device_type: type,
-            status: status || 'Off',
-            home_id: homeId,
-            room_id: roomId
-        });
-
-        await device.save();
-        res.status(201).json(device);
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating device', error: error.message });
-    }
-}; */
-
-
 const createNewDevice = async (req, res) => {
     try {
         let { homeId, roomId } = req.params;
@@ -208,19 +186,45 @@ const moveDeviceToRoom = async (req, res) => {
         const { deviceId, roomId } = req.params;
         const { newRoomId } = req.body;
 
-        const device = await Device.findByIdAndUpdate(
-            deviceId,
-            { room_id: newRoomId },
-            { new: true }
-        );
+        console.log(`Looking for device ${deviceId} in room ${roomId}`); // for debugging
+
+        // Find device in current room
+        const device = await Device.findOne({
+            _id: deviceId,
+            room_id: roomId
+        });
 
         if (!device) {
+            console.log('Device not found in specified room'); // Debug log
             return res.status(404).json({ message: 'Device not found' });
         }
 
-        res.status(200).json({ message: 'Device moved successfully', device });
+        // Verify new room exists
+        const newRoom = await Room.findById(newRoomId);
+        if (!newRoom) {
+            return res.status(404).json({ message: 'New room not found' });
+        }
+
+        // Update device
+        device.room_id = newRoomId;
+        await device.save();
+
+        res.status(200).json({ 
+            message: 'Device moved successfully',
+            device: {
+                _id: device._id,
+                name: device.device_name,
+                new_room_id: device.room_id,
+                home_id: device.home_id
+            }
+        });
+
     } catch (error) {
-        res.status(500).json({ message: 'Error moving device', error: error.message });
+        console.error('Move device error:', error); // Add error logging
+        res.status(500).json({ 
+            message: 'Error moving device',
+            error: error.message
+        });
     }
 };
 
@@ -230,7 +234,7 @@ module.exports = {
     controlDevice,
     createNewDevice,
     moveDeviceToRoom,
-  deviceInfo
+    deviceInfo
 };
 
 

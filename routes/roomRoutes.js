@@ -9,6 +9,9 @@ const { moveDeviceToRoom } = require('../db/controllers/deviceController')
 
 router.post('/homes/:homeId/rooms/add', addRoom); 
 router.get('/:roomId/devices', getRoomDevices);
-router.post('/:roomId/devices/:deviceId/move', moveDeviceToRoom);
+
+//router.post('/:roomId/devices/:deviceId/move', moveDeviceToRoom);
+
+router.post('/rooms/:roomId/devices/:deviceId/move', moveDeviceToRoom);
 
 module.exports = router;
