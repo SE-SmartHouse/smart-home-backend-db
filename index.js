@@ -17,6 +17,10 @@ connectDB();
 app.get('/api/test', (req, res) => {
     res.send('API is working');
 });
+//cross-origin resource sharing
+const cors = require('cors');
+app.use(cors({origins: '*'}));
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', homeRoutes);
 app.use('/api', roomRoutes);
