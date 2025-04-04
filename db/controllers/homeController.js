@@ -15,6 +15,7 @@ const getUserHomes = async (req, res) => {
         // Verify user exists
         const user = await User.findById(userId);
         if (!user) {
+            console.log(userId)
             return res.status(404).json({ message: 'User not found' });
         }
 

@@ -25,7 +25,7 @@ const registerUser = async (req, res) => {
 
         await user.save();
 
-        res.status(200).json({ message: 'User registered' /*, userId: user._id, role*/ });
+        res.status(200).json({ message: 'User registered', userId:user._id.toString() });
     } catch (error) {
         if (error) {
             return res.status(500).json({ message: 'Error registering user', error: error.message });};
@@ -72,7 +72,7 @@ const checkUser = async (req, res) => {
         }
 
         // Find the user in the database by its id
-        const user = await User.findOne({ userId });
+        const user = await User.findById( userId );
         if (user) {
             // If user exists, return success response
             return res.status(200).json({ message: 'User exists in the system.'});
