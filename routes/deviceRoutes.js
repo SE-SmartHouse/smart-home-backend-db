@@ -12,7 +12,7 @@ router.get('/devices/:deviceId', deviceInfo);
 
 //router.post('/:homeId/rooms/:roomId/createNewDevice', createNewDevice);
 
-router.post('/homes/:homeId/rooms/:roomId/devices', createNewDevice);
+router.post('/homes/:homeId/rooms/:roomId/registerNewDevice', createNewDevice);
 
 
 module.exports = router;

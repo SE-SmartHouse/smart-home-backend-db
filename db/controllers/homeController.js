@@ -18,17 +18,17 @@ const getUserHomes = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Find homes owned by this user
-        const homes = await Home.find({ owner_id: userId });
+        // Find homes assigned to user
+        const homes = await Home.find({_id:{$in: user.home_ids}});
         if (!homes.length) {
             return res.status(200).json([]); // Empty array if no homes
         }
 
-        
+
         const homeList = homes.map(home => ({
             _id: home._id.toString(),
             home_name: home.home_name,
-            address: home.address, // No default, schema value or undefined
+            address: home.address
         }));
 
         res.status(200).json(homeList);
@@ -114,7 +114,7 @@ const createNewHome = async (req, res) => {
         });
 
         await Promise.all([home.save(), livingRoom.save()]);
-        
+
         res.status(201).json({ 
             homeId: home._id,
             home_name: home.home_name,

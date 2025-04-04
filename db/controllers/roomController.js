@@ -8,7 +8,7 @@ const Device = require('../models/Device');
 const addRoom = async (req, res) => {
     try {
         let { homeId } = req.params;
-        const { roomName } = req.body;
+        const { newRoomName: newRoomName } = req.body;
 
         // ===== IMPROVED VALIDATION =====
         // 1. Clean and validate homeId
@@ -24,10 +24,10 @@ const addRoom = async (req, res) => {
         }
 
         // 2. Validate roomName
-        if (!roomName?.trim() || typeof roomName !== 'string') {
+        if (!newRoomName?.trim() || typeof newRoomName !== 'string') {
             return res.status(400).json({
                 message: 'roomName must be a non-empty string',
-                received: roomName
+                received: newRoomName
             });
         }
 
@@ -45,7 +45,7 @@ const addRoom = async (req, res) => {
 
         // 2. Create and save room
         const room = new Room({
-            room_name: roomName.trim(),
+            room_name: newRoomName.trim(),
             home_id: objectId
         });
 

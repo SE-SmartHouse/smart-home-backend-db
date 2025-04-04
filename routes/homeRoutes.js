@@ -7,9 +7,7 @@ const { generateHomeId, saveHomeDevices, createNewHome, getHomeRooms, getUserHom
 router.post('/homes/createNewHome', createNewHome);
 
 // Get rooms for a home
-router.get('/homes/:homeId/rooms', getHomeRooms);
-
-//router.post('/generate-home', generateHomeId);
+router.get('/homes/:homeId/rooms', getHomeRooms);//router.post('/generate-home', generateHomeId);
 //router.post('/save-devices', saveHomeDevices);
 router.get('/users/:userId/homes', getUserHomes);
 

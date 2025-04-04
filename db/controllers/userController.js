@@ -14,13 +14,9 @@ const registerUser = async (req, res) => {
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'Email already in use' });
+            return res.status(409).json({ message: 'Email already in use' });
         }
-/*
-        const homeUsers = await User.find({ home_id: homeId });
-        const role = homeUsers.length === 0 ? 'Admin' : 'User'; // First user is Admin
 
-        */
         const user = new User({
             name,
             email,
@@ -29,23 +25,13 @@ const registerUser = async (req, res) => {
 
         await user.save();
 
-        /*
-
-        if (!home.owner_id && role === 'Admin') {
-            home.owner_id = user._id;
-            await home.save();
-        }
-            */
-
         res.status(200).json({ message: 'User registered' /*, userId: user._id, role*/ });
     } catch (error) {
         if (error) {
             return res.status(500).json({ message: 'Error registering user', error: error.message });};
         }
-        
     };
 
-    
 // Controller for login
 const loginUser = async (req, res) => {
     try {
@@ -64,7 +50,7 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials.' });
         }
         // Respond with a success message and token
-        return res.status(200).json({ message: 'User logged in'});
+        return res.status(200).json({ message: user._id});
     } catch (error) {
         console.error('Error during login:', error);
         return res.status(500).json({ message: 'An error occurred during login.', error: error.message });
@@ -77,11 +63,11 @@ const checkUser = async (req, res) => {
         const { userId } = req.body;
 
         // Validate the email input
-         // Validate the userId format
+        // Validate the userId format
          if (!mongoose.Types.ObjectId.isValid(userId)) {
             return res.status(400).json({ message: 'Invalid User ID format.' });
         }
-       
+
         // Find the user in the database by its id
         const user = await User.findOne({ userId });
         if (user) {
@@ -96,7 +82,7 @@ const checkUser = async (req, res) => {
         return res.status(500).json({ message: 'An error occurred while checking user existence.', error: error.message });
     }
 };
-        
+
 
 
 /* //Not in required Controllers
@@ -131,62 +117,36 @@ const assignAdminRole = async (req, res) => {
 const assignHomeToUser = async (req, res) => {
     try {
         const { userId } = req.params;
-        const { homeId, home_name, address, floor_number } = req.body;
+        const { homeId } = req.body;
 
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if (user.home_id) {
-            return res.status(400).json({ message: 'User already has a home assigned' });
+        if (user.home_ids.includes(homeId)) {
+            return res.status(401).json({ message: 'User already has that home assigned' });
         }
 
         const Home = require('../models/Home');
         const Room = require('../models/Room');
 
-        let home;
-        let isNewHome = false;
-
         if (homeId) {
-            // Assign existing home
+            // if home does not exist
             home = await Home.findById(homeId);
             if (!home) {
                 return res.status(404).json({ message: 'Provided homeId does not exist' });
             }
-
-            // Assign the user as owner if not already
-            if (!home.owner_id) {
-                home.owner_id = user._id;
-                await home.save();
-            }
-
-        } else {
-            // Create new home
-            home = new Home({
-                home_name: home_name || `${user.name}'s Home`,
-                address: address || '',
-                owner_id: user._id
-            });
-
+            home.owners.push(user._id);
             await home.save();
-            isNewHome = true;
 
-            // Create default room
-            const livingRoom = new Room({
-                room_name: 'Living Room',
-                home_id: home._id,
-                floor_number: floor_number || 1
-            });
-            await livingRoom.save();
         }
-
         // Assign home to user
-        user.home_id = home._id;
+        user.home_ids.push(home._id);
         await user.save();
 
         res.status(200).json({
-            message: isNewHome ? 'New home created and assigned to user' : 'Existing home assigned to user',
+            message: 'Home assigned to user',
             homeId: home._id,
             userId: user._id,
             home_name: home.home_name
