@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const roomSchema = new mongoose.Schema({
   room_name: { type: String, required: true },
   floor_number: Number,
-  home_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Home' }
+  home_id: { type: String, ref: 'Home' }
 });
 
 roomSchema.index({ home_id: 1 });

@@ -6,6 +6,11 @@ const User = require('../models/User');
 
 const Room = require('../models/Room'); // I added this
 
+const { customAlphabet } = require('nanoid');
+
+const generateShortId = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 6); // e.g., 'X9ABCD'
+
+
 
 // Get User homes
 const getUserHomes = async (req, res) => {
@@ -100,9 +105,16 @@ const generateHomeId = async (req, res) => {
 const createNewHome = async (req, res) => {
     try {
         const { home_name, address, floor_number } = req.body;
+
+        // Generate a unique short ID
+        let shortId;
+        do {
+            shortId = generateShortId(); // Example: "J3Z8KP"
+        } while (await Home.exists({ _id: shortId }));
         
         // Create home with custom name or default generated name
         const home = new Home({
+            _id: shortId,
             home_name: home_name || `Home-${new mongoose.Types.ObjectId().toString().slice(-6)}`,
             address: address || null,
         });

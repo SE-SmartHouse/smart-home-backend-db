@@ -20,16 +20,19 @@ Setup
 2. Configure Environment:
    Use your local DB we have used "smarthome"
    - Create a `.env` file:
-     MONGO_URI=mongodb://localhost:27017/smarthome
-     PORT=3000
+     
+     MONGO_URI=mongodb+srv://<<db_username>>:<db_password>@smarthomecluster.yjqefe7.mongodb.net/?retryWrites=true&w=majority&appName=SmartHomeCluster
+     PORT=4000
 
-4. Start MongoDB:
-   - Run MongoDB locally (Windows example):
-     "C:\Program Files\MongoDB\Server\8.0\bin\mongod.exe"
+     DB_NAME=SmartHomeCluster
+
+4. Input DB credentials:
+   npm start
+   - Replace username_db, and password_db with provided credentials.
 
 5. Start Server:
    npm start
-   - Expected output: `MongoDB connected` and `Server running on port 3000`.
+   - Expected output: `MongoDB connected` and `Server running on port 4000`.
 
 API Endpoints
 
@@ -43,11 +46,8 @@ Test these endpoints using Postman or a similar tool.
 
 
 Testing Tips
-- MongoDB Compass: Use to view changes in the `smarthome` database (`homes`, `users`, `devices` collections).
-- MongoDB Shell: Query with:
-  use smarthome
-  db.devices.find({ _id: ObjectId("any id") })
+- MongoDB Compass: Use to view changes in the `smarthomecluster` database (`homes`, `users`, `devices` collections).
+
 Notes
-- Passwords are stored in plain text—add hashing (e.g., bcrypt) for production.
-- Authentication (e.g., JWT) is not yet implemented.
-- Ensure MongoDB is running before starting the server.
+- Authentication (e.g., JWT) is implemented at server side.
+

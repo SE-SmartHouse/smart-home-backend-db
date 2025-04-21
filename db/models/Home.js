@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const homeSchema = new mongoose.Schema({
+  _id: { type: String }, //custom short string ID
   home_name: { type: String, required: true },
   address: { type: String, required: false },
   owners: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
