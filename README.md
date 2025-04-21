@@ -18,10 +18,10 @@ Setup
    npm install
 
 2. Configure Environment:
-   Use your local DB we have used "smarthome"
    - Create a `.env` file:
      
      MONGO_URI=mongodb+srv://<<db_username>>:<db_password>@smarthomecluster.yjqefe7.mongodb.net/?retryWrites=true&w=majority&appName=SmartHomeCluster
+     
      PORT=4000
 
      DB_NAME=SmartHomeCluster
