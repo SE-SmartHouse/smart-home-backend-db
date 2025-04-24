@@ -12,16 +12,17 @@ const addRoom = async (req, res) => {
 
         // ===== IMPROVED VALIDATION =====
         // 1. Clean and validate homeId
-        homeId = homeId.replace(/ObjectId\("|"\)/g, '').trim();
-        
-        if (!/^[0-9a-fA-F]{24}$/.test(homeId)) {
+        homeId = homeId.trim();
+
+        //I changed this because home id became string not mongoDb object
+        if (!homeId || typeof homeId !== 'string') {
             return res.status(400).json({ 
                 message: 'Invalid homeId format',
-                solution: 'Must be 24-character hex string (0-9, a-f)',
-                example: '507f191e810c19729de860ea',
+                solution: 'Must be a non-empty short string',
                 received: homeId
             });
         }
+
 
         // 2. Validate roomName
         if (!newRoomName?.trim() || typeof newRoomName !== 'string') {
@@ -32,7 +33,7 @@ const addRoom = async (req, res) => {
         }
 
         // ===== DATABASE OPERATIONS =====
-        const objectId = new mongoose.Types.ObjectId(homeId);
+        const objectId = homeId;
         
         // 1. Verify home exists
         const homeExists = await mongoose.model('Home').exists({ _id: objectId });

@@ -4,8 +4,18 @@ const deviceSchema = new mongoose.Schema({
     device_name: { type: String, required: true },
     device_type: { type: String, required: true },
     room_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
+
+    //home_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Home' },
     home_id: { type: String, ref: 'Home' },
-    status: { type: String, enum: ['On', 'Off', 'Standby'], default: 'Off' },
+    //status: { type: String, enum: ['On', 'Off', 'Standby'], default: 'Off' },
+    //status is replaced to include open and close for doors and windows
+    status: { 
+        type: String, 
+        enum: ['On', 'Off', 'Standby', 'Open', 'Closed'], 
+        default: function () {
+          return ['door', 'window'].includes(this.device_type) ? 'Closed' : 'Off';
+        }
+      },
     ip_address: String,
     emergency_override: {
         priority: { type: Number, enum: [1, 2], default: 1 },
