@@ -4,6 +4,7 @@ const deviceSchema = new mongoose.Schema({
     device_name: { type: String, required: true },
     device_type: { type: String, required: true },
     room_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Room' },
+
     //home_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Home' },
     home_id: { type: String, ref: 'Home' },
     //status: { type: String, enum: ['On', 'Off', 'Standby'], default: 'Off' },
