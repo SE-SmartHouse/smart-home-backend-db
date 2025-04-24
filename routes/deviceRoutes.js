@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createNewDevice, getHomeDevices, controlDevice, changeDeviceRoom, deviceInfo } = require('../db/controllers/deviceController');
+const { createNewDevice, getHomeDevices, controlDevice, changeDeviceRoom, deviceInfo, setDeviceStatus } = require('../db/controllers/deviceController');
 
 
 //router.get('/devices/:userId', getHomeDevices);
@@ -13,6 +13,9 @@ router.get('/devices/:deviceId', deviceInfo);
 //router.post('/:homeId/rooms/:roomId/createNewDevice', createNewDevice);
 
 router.post('/homes/:homeId/rooms/:roomId/registerNewDevice', createNewDevice);
+
+router.post('/devices/:deviceId/set-status', setDeviceStatus);
+
 
 
 module.exports = router;

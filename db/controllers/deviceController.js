@@ -107,19 +107,19 @@ const createNewDevice = async (req, res) => {
         const { name, type, status } = req.body;
 
         // Clean and validate IDs
-        homeId = homeId.replace(/ObjectId\("|"\)/g, '').trim();
+        homeId = homeId.trim();
         roomId = roomId.replace(/ObjectId\("|"\)/g, '').trim();
         
-        if (!/^[0-9a-fA-F]{24}$/.test(homeId) || !/^[0-9a-fA-F]{24}$/.test(roomId)) {
-            return res.status(400).json({ 
-                message: 'Invalid ID format',
-                solution: 'Use 24-character hex string',
-                example: '507f191e810c19729de860ea'
+        if (!roomId || !/^[0-9a-fA-F]{24}$/.test(roomId)) {
+            return res.status(400).json({
+                message: 'Invalid room ID format',
+                solution: 'roomId must be a 24-character hex string',
+                example: '507f191e810c19729de860ea',
+                received: roomId
             });
         }
-
-        // Convert to ObjectId
-        const homeObjectId = new mongoose.Types.ObjectId(homeId);
+        
+        const homeObjectId = homeId; // Use string ID as-is
         const roomObjectId = new mongoose.Types.ObjectId(roomId);
 
         // Verify home and room exist
@@ -147,10 +147,21 @@ const createNewDevice = async (req, res) => {
             });
         }
 
+        //status based the device
+        let resolvedStatus = 'Off';
+
+        if (type === 'light' || type === 'thermostat') {
+            resolvedStatus = ['On', 'Off', 'Standby'].includes(status) ? status : 'Off';
+        } else if (type === 'door' || type === 'window') {
+            resolvedStatus = ['Open', 'Closed'].includes(status) ? status : 'Closed';
+        } else {
+            resolvedStatus = status?.trim() || 'Off';
+        }
+
         const device = new Device({
             device_name: name.trim(),
             device_type: type.trim(),
-            status: ['On', 'Off', 'Standby'].includes(status) ? status : 'Off',
+            status: resolvedStatus,
             room_id: roomObjectId,
             home_id: homeObjectId
         });
@@ -228,13 +239,65 @@ const moveDeviceToRoom = async (req, res) => {
     }
 };
 
+const setDeviceStatus = async (req, res) => {
+    try {
+        const { deviceId } = req.params;
+        const { status } = req.body;
+
+        if (!status || typeof status !== 'string') {
+            return res.status(400).json({ message: 'Status is required and must be a string.' });
+        }
+
+        const device = await Device.findById(deviceId);
+        if (!device) {
+            return res.status(404).json({ message: 'Device not found.' });
+        }
+
+        const validStatusByType = {
+            light: ['On', 'Off', 'Standby'],
+            thermostat: ['On', 'Off', 'Standby'],
+            door: ['Open', 'Closed'],
+            window: ['Open', 'Closed'],
+            temperature_sensor: ['Off'] // just for safety, not really controllable
+        };
+
+        const allowedStatuses = validStatusByType[device.device_type] || [];
+
+        if (!allowedStatuses.includes(status)) {
+            return res.status(400).json({
+                message: `Invalid status '${status}' for device type '${device.device_type}'.`,
+                allowed: allowedStatuses
+            });
+        }
+
+        device.status = status;
+        await device.save();
+
+        return res.status(200).json({
+            message: `Device status updated successfully.`,
+            device: {
+                id: device._id,
+                name: device.device_name,
+                type: device.device_type,
+                status: device.status
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in setDeviceStatus:', error);
+        return res.status(500).json({ message: 'Failed to set device status.', error: error.message });
+    }
+};
+
+
 module.exports = { 
     /*changeDeviceRoom, 
     getHomeDevices, */
     controlDevice,
     createNewDevice,
     moveDeviceToRoom,
-    deviceInfo
+    deviceInfo,
+    setDeviceStatus
 };
 
 

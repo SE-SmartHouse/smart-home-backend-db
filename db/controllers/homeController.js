@@ -25,6 +25,7 @@ const getUserHomes = async (req, res) => {
         }
 
         // Find homes assigned to user
+        console.log("userId:",userId)
         const homes = await Home.find({_id:{$in: user.home_ids}});
         if (!homes.length) {
             return res.status(200).json([]); // Empty array if no homes

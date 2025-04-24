@@ -4,6 +4,7 @@ const connectDB = require('./db/config/db');
 const homeRoutes = require('./routes/homeRoutes');
 const userRoutes = require('./routes/userRoutes');
 const deviceRoutes = require('./routes/deviceRoutes');
+const sensorRoutes = require('./routes/sensorRoutes');
 
 //added rout
 const roomRoutes = require('./routes/roomRoutes');
@@ -26,6 +27,8 @@ app.use('/api', homeRoutes);
 app.use('/api', roomRoutes);
 app.use('/api', userRoutes);
 app.use('/api', deviceRoutes);
+
+app.use('/api', sensorRoutes);
 
 
 const PORT = process.env.PORT || 3000;
