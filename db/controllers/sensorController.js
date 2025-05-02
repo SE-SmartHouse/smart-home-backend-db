@@ -1,7 +1,7 @@
 const SensorData = require('../models/SensorData');
 const Device = require('../models/Device');
 
-// POST: Receive temperature data
+// POST: Receive Reading data
 const submitReading = async (req, res) => {
     try {
         const { deviceId } = req.params;

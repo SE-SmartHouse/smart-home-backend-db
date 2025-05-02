@@ -1,9 +1,9 @@
 
 const express = require('express');
 const router = express.Router();
-const {submitTemperatureReading, getLatestTemperature} = require('../db/controllers/sensorController');
+const {submitReading, getLatestReading} = require('../db/controllers/sensorController');
 
-router.post('/devices/:deviceId/temperature', submitTemperatureReading);
-router.get('/devices/:deviceId/temperature', getLatestTemperature);
+router.post('/devices/:deviceId/temperature', submitReading);
+router.get('/devices/:deviceId/temperature', getLatestReading);
 
 module.exports = router;
