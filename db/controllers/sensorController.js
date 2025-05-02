@@ -2,14 +2,14 @@ const SensorData = require('../models/SensorData');
 const Device = require('../models/Device');
 
 // POST: Receive temperature data
-const submitTemperatureReading = async (req, res) => {
+const submitReading = async (req, res) => {
     try {
         const { deviceId } = req.params;
         const { reading, unit } = req.body;
 
         const device = await Device.findById(deviceId);
-        if (!device || device.device_type !== 'temperature_sensor') {
-            return res.status(400).json({ message: 'Invalid device or not a temperature sensor' });
+        if (!device || device.device_type !== 'reading_sensor') {
+            return res.status(400).json({ message: 'Invalid device or not a Reading sensor' });
         }
 
         const entry = new SensorData({
@@ -20,14 +20,14 @@ const submitTemperatureReading = async (req, res) => {
 
         await entry.save();
 
-        res.status(201).json({ message: 'Temperature recorded', data: entry });
+        res.status(201).json({ message: 'Reading recorded', data: entry });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to save temperature', error: error.message });
+        res.status(500).json({ message: 'Failed to save Reading', error: error.message });
     }
 };
 
 // GET: Return latest reading
-const getLatestTemperature = async (req, res) => {
+const getLatestReading = async (req, res) => {
     try {
         const { deviceId } = req.params;
 
@@ -35,13 +35,13 @@ const getLatestTemperature = async (req, res) => {
             .sort({ timestamp: -1 });
 
         if (!latest) {
-            return res.status(404).json({ message: 'No temperature data found' });
+            return res.status(404).json({ message: 'No data found' });
         }
 
         res.status(200).json(latest);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch temperature', error: error.message });
+        res.status(500).json({ message: 'Failed to fetch Reading', error: error.message });
     }
 };
 
-module.exports = { submitTemperatureReading, getLatestTemperature };
+module.exports = { submitReading, getLatestReading };
