@@ -44,4 +44,7 @@ const getLatestReading = async (req, res) => {
     }
 };
 
+
+
+
 module.exports = { submitReading, getLatestReading };

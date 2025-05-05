@@ -155,10 +155,29 @@ const getHomeRooms = async (req, res) => {
     }
 };
 
+
+const getAllSensorReadings = async (req, res) => {
+    try {
+        const { homeId } = req.params;
+
+        const readings = await SensorData.find({ device_id: deviceId })
+            .sort({ timestamp: -1 });
+
+        if (!readings || readings.length === 0) {
+            return res.status(404).json({ message: 'No data found' });
+        }
+
+        res.status(200).json(readings);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch Readings', error: error.message });
+    }
+};
+
 module.exports = { 
     /*generateHomeId, 
     saveHomeDevices,*/ 
     createNewHome,
     getHomeRooms,
-    getUserHomes
+    getUserHomes,
+    getAllSensorReadings
 };

@@ -6,4 +6,5 @@ const {submitReading, getLatestReading} = require('../db/controllers/sensorContr
 router.post('/devices/:deviceId/temperature', submitReading);
 router.get('/devices/:deviceId/temperature', getLatestReading);
 
+
 module.exports = router;
