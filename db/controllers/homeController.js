@@ -193,7 +193,7 @@ const getAllSensorReadings = async (req, res) => {
         if (combineData.length === 0) {
             return res.status(300).json({ message: 'No sensors found for this home' });
         }
-        return res.status(200).json(combineData);
+        return res.status(200).json({data:combineData});
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch Readings', error: error.message });
     }
