@@ -7,6 +7,7 @@ const User = require('../models/User');
 const Room = require('../models/Room'); // I added this
 
 const { customAlphabet } = require('nanoid');
+const SensorData = require('../models/SensorData');
 
 const generateShortId = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 6); // e.g., 'X9ABCD'
 
@@ -160,14 +161,39 @@ const getAllSensorReadings = async (req, res) => {
     try {
         const { homeId } = req.params;
 
-        const readings = await SensorData.find({ device_id: deviceId })
-            .sort({ timestamp: -1 });
 
-        if (!readings || readings.length === 0) {
-            return res.status(404).json({ message: 'No data found' });
+        const sensors = await Device.find({home_id: homeId, 
+            device_type: 'reading_sensor'});
+
+        const sensor_data = await SensorData.find({ device_id: { $in: sensors.map(sensor => sensor._id) } }).sort({ timestamp: -1 });
+        
+
+        const combineData = sensors.map(sensor => {
+            const latest_readings = sensor_data.filter(data => data.device_id.toString() === sensor._id.toString());
+
+            const reading = latest_readings[0]; //Map always returns an array
+
+
+            const response =  {
+                device_id: sensor._id,
+                device_name: sensor.device_name,
+                device_type: sensor.device_type,
+                status: sensor.status,
+                reading: reading?.reading ?? "data missing",
+                unit: reading?.unit ?? "data missing",
+                timestamp: reading?.timestamp ?? "data missing"
+            };
+
+            JSON.stringify(response);
+            return response;
+            
         }
-
-        res.status(200).json(readings);
+        );
+        // If no sensors are found, returns this
+        if (combineData.length === 0) {
+            return res.status(300).json({ message: 'No sensors found for this home' });
+        }
+        return res.status(200).json(combineData);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch Readings', error: error.message });
     }
