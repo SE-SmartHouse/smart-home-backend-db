@@ -14,4 +14,6 @@ router.get('/:roomId/devices', getRoomDevices);
 
 router.post('/rooms/:roomId/devices/:deviceId/move', moveDeviceToRoom);
 
+
+
 module.exports = router;
