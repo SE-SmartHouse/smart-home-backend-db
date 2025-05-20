@@ -255,7 +255,7 @@ const setDeviceStatus = async (req, res) => {
 
         const validStatusByType = {
             light: ['On', 'Off', 'Standby'],
-            thermostat: ['On', 'Off', 'Standby'],
+            fan: ['On', 'Off', 'Standby'],
             door: ['Open', 'Closed'],
             window: ['Open', 'Closed'],
             temperature_sensor: ['Off'] // just for safety, not really controllable
