@@ -97,7 +97,9 @@ const addRoom = async (req, res) => {
 const getRoomDevices = async (req, res) => {
     try {
         const { roomId } = req.params;
-        const devices = await Device.find({ room_id: roomId });
+        const devices = await Device.find({
+            room_id: roomId,
+            device_type: { $ne: 'reading_sensor' }});
         res.status(200).json(devices);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching devices', error: error.message });
