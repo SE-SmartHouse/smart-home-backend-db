@@ -150,7 +150,7 @@ const createNewDevice = async (req, res) => {
         //status based the device
         let resolvedStatus = 'Off';
 
-        if (type === 'light' || type === 'thermostat') {
+        if (type === 'light' || type === 'fan') {
             resolvedStatus = ['On', 'Off', 'Standby'].includes(status) ? status : 'Off';
         } else if (type === 'door' || type === 'window') {
             resolvedStatus = ['Open', 'Closed'].includes(status) ? status : 'Closed';
